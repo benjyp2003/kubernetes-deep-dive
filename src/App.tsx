@@ -26,6 +26,8 @@ import Glossary from "./pages/Glossary";
 import Troubleshooting from "./pages/Troubleshooting";
 import Simulator from "./pages/Simulator";
 import SimulatorScenarioPage from "./pages/SimulatorScenario";
+import TroubleshootingLab from "./pages/TroubleshootingLab";
+import TroubleshootingLabScenario from "./pages/TroubleshootingLabScenario";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -60,6 +62,8 @@ const App = () => (
           <Route path="/troubleshooting" element={<Troubleshooting />} />
           <Route path="/simulator" element={<Simulator />} />
           <Route path="/simulator/:scenarioId" element={<SimulatorScenarioPage />} />
+          <Route path="/troubleshooting-lab" element={<TroubleshootingLab />} />
+          <Route path="/troubleshooting-lab/:scenarioId" element={<TroubleshootingLabScenario />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>
