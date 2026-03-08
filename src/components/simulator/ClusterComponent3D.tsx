@@ -1,3 +1,4 @@
+// 3D Kubernetes cluster component
 import { useRef, useState } from "react";
 import { useFrame } from "@react-three/fiber";
 import { Text, Html } from "@react-three/drei";
