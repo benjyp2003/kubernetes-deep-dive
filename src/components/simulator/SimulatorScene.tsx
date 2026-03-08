@@ -20,11 +20,12 @@ const SimulatorScene = ({ scenario, currentStep, onComponentClick }: Props) => {
   };
 
   return (
+    <div style={{ width: "100%", height: "100%", position: "absolute", inset: 0 }}>
     <Canvas
       shadows
       gl={{ antialias: true, alpha: true }}
-      style={{ background: "transparent" }}
-      dpr={[1, 2]}
+      style={{ background: "transparent", width: "100%", height: "100%" }}
+      dpr={[1, 1.5]}
     >
       <PerspectiveCamera makeDefault position={[0, 4, 10]} fov={50} />
       <OrbitControls
