@@ -95,11 +95,6 @@ const ClusterComponent3D = ({ id, label, type, description, position, active, on
     }
   };
 
-  // Need to import RoundedBox geometry
-  const RoundedBoxGeometry = () => {
-    return <boxGeometry args={[size[0], size[1], size[2]]} />;
-  };
-
   return (
     <group position={position}>
       {/* Glow */}
