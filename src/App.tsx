@@ -20,6 +20,8 @@ import Config from "./pages/Config";
 import Operators from "./pages/Operators";
 import OpenShift from "./pages/OpenShift";
 import Flows from "./pages/Flows";
+import VisualLab from "./pages/VisualLab";
+import VisualLabScenario from "./pages/VisualLabScenario";
 import Glossary from "./pages/Glossary";
 import Troubleshooting from "./pages/Troubleshooting";
 import NotFound from "./pages/NotFound";
