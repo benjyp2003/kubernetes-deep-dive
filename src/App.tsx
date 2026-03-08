@@ -24,6 +24,8 @@ import VisualLab from "./pages/VisualLab";
 import VisualLabScenario from "./pages/VisualLabScenario";
 import Glossary from "./pages/Glossary";
 import Troubleshooting from "./pages/Troubleshooting";
+import Simulator from "./pages/Simulator";
+import SimulatorScenarioPage from "./pages/SimulatorScenario";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -56,6 +58,8 @@ const App = () => (
           <Route path="/visual-lab/:scenarioId" element={<VisualLabScenario />} />
           <Route path="/glossary" element={<Glossary />} />
           <Route path="/troubleshooting" element={<Troubleshooting />} />
+          <Route path="/simulator" element={<Simulator />} />
+          <Route path="/simulator/:scenarioId" element={<SimulatorScenarioPage />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>
