@@ -58,6 +58,8 @@ const App = () => (
           <Route path="/visual-lab/:scenarioId" element={<VisualLabScenario />} />
           <Route path="/glossary" element={<Glossary />} />
           <Route path="/troubleshooting" element={<Troubleshooting />} />
+          <Route path="/simulator" element={<Simulator />} />
+          <Route path="/simulator/:scenarioId" element={<SimulatorScenarioPage />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>
