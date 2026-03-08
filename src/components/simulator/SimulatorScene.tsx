@@ -76,6 +76,7 @@ const SimulatorScene = ({ scenario, currentStep, onComponentClick }: Props) => {
         ))}
       </Suspense>
     </Canvas>
+    </div>
   );
 };
 
