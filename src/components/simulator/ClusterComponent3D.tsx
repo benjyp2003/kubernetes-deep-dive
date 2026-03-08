@@ -1,6 +1,6 @@
 import { useRef, useState } from "react";
 import { useFrame } from "@react-three/fiber";
-import { Text, Html, RoundedBox } from "@react-three/drei";
+import { Text, Html } from "@react-three/drei";
 import * as THREE from "three";
 import type { ComponentType } from "./types";
 
