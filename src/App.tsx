@@ -24,6 +24,8 @@ import VisualLab from "./pages/VisualLab";
 import VisualLabScenario from "./pages/VisualLabScenario";
 import Glossary from "./pages/Glossary";
 import Troubleshooting from "./pages/Troubleshooting";
+import Simulator from "./pages/Simulator";
+import SimulatorScenarioPage from "./pages/SimulatorScenario";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
