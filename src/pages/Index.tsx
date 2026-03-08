@@ -136,6 +136,40 @@ const Index = () => {
         </div>
       </section>
 
+      {/* Practice Labs */}
+      <section className="px-4 md:px-6 pb-12">
+        <div className="max-w-4xl mx-auto">
+          <h2 className="font-display text-2xl font-bold text-foreground text-center mb-2">
+            Interactive Practice Labs
+          </h2>
+          <p className="text-center text-muted-foreground mb-8">Hands-on environments to deepen your understanding</p>
+          <div className="grid sm:grid-cols-3 gap-4">
+            {[
+              { icon: Bug, title: "Troubleshooting Lab", desc: "Debug realistic Kubernetes failures using simulated kubectl commands.", to: "/troubleshooting-lab", color: "text-destructive", bg: "bg-destructive/10" },
+              { icon: FlaskConical, title: "Visual Lab", desc: "Watch Kubernetes processes unfold step-by-step with interactive diagrams.", to: "/visual-lab", color: "text-primary", bg: "bg-primary/10" },
+              { icon: Gamepad2, title: "3D Simulator", desc: "Explore cluster architecture in an interactive 3D environment.", to: "/simulator", color: "text-[hsl(var(--k8s-cyan))]", bg: "bg-[hsl(var(--k8s-cyan))]/10" },
+            ].map((item, i) => (
+              <motion.div
+                key={i}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: i * 0.1 }}
+              >
+                <Link to={item.to} className="k8s-card block group hover:border-primary/40 transition-all h-full text-center">
+                  <div className={`mx-auto mb-3 inline-flex rounded-xl ${item.bg} p-3`}>
+                    <item.icon className={`h-6 w-6 ${item.color}`} />
+                  </div>
+                  <h3 className="font-display font-semibold text-foreground group-hover:text-primary transition-colors">{item.title}</h3>
+                  <p className="mt-2 text-sm text-muted-foreground leading-relaxed">{item.desc}</p>
+                  <p className="mt-3 text-xs text-primary font-medium">Explore →</p>
+                </Link>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </section>
+
       {/* Topics Grid */}
       <section className="px-4 md:px-6 pb-16">
         <div className="max-w-6xl mx-auto">
