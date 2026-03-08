@@ -1,7 +1,7 @@
 import {
   Home, BookOpen, Server, Box, Layers, Network, HardDrive,
   Shield, Target, Tag, Settings, FolderTree, FileCode,
-  Globe, Puzzle, AlertTriangle, BookA, Workflow, HelpCircle
+  Globe, Puzzle, AlertTriangle, BookA, Workflow, HelpCircle, FlaskConical
 } from "lucide-react";
 import { NavLink } from "@/components/NavLink";
 import { useLocation } from "react-router-dom";
@@ -52,6 +52,7 @@ const sections = [
     items: [
       { title: "Troubleshooting", url: "/troubleshooting", icon: AlertTriangle },
       { title: "Interactive Flows", url: "/flows", icon: Workflow },
+      { title: "Visual Lab", url: "/visual-lab", icon: FlaskConical },
       { title: "Glossary", url: "/glossary", icon: HelpCircle },
     ],
   },

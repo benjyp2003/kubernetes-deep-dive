@@ -20,6 +20,8 @@ import Config from "./pages/Config";
 import Operators from "./pages/Operators";
 import OpenShift from "./pages/OpenShift";
 import Flows from "./pages/Flows";
+import VisualLab from "./pages/VisualLab";
+import VisualLabScenario from "./pages/VisualLabScenario";
 import Glossary from "./pages/Glossary";
 import Troubleshooting from "./pages/Troubleshooting";
 import NotFound from "./pages/NotFound";
@@ -50,6 +52,8 @@ const App = () => (
           <Route path="/operators" element={<Operators />} />
           <Route path="/openshift" element={<OpenShift />} />
           <Route path="/flows" element={<Flows />} />
+          <Route path="/visual-lab" element={<VisualLab />} />
+          <Route path="/visual-lab/:scenarioId" element={<VisualLabScenario />} />
           <Route path="/glossary" element={<Glossary />} />
           <Route path="/troubleshooting" element={<Troubleshooting />} />
           <Route path="*" element={<NotFound />} />
