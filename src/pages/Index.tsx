@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import {
   BookOpen, Server, Box, Layers, Network, HardDrive, Shield, Target,
   FileCode, Globe, Puzzle, AlertTriangle, ArrowRight, Zap, Eye, Brain,
-  Compass, ChevronRight, Settings
+  Compass, ChevronRight, Settings, Bug, FlaskConical, Gamepad2
 } from "lucide-react";
 import TopicCard from "@/components/learning/TopicCard";
 import Layout from "@/components/Layout";
