@@ -76,7 +76,7 @@ const SimulatorScenario = () => {
         <div className="flex flex-col lg:flex-row gap-4 h-[calc(100vh-260px)] min-h-[500px]">
           {/* 3D Canvas */}
           <div className="flex-1 flex flex-col gap-3">
-            <div className="flex-1 rounded-xl border border-border bg-background/50 overflow-hidden relative">
+            <div className="flex-1 rounded-xl border border-border bg-background/50 overflow-hidden relative" style={{ minHeight: "450px" }}>
               <SimulatorScene
                 scenario={scenario}
                 currentStep={currentStep}
