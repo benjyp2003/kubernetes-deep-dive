@@ -47,33 +47,31 @@ const SimulatorScene = ({ scenario, currentStep, onComponentClick }: Props) => {
       {/* Grid */}
       <gridHelper args={[20, 20, "#1e293b", "#0f172a"]} position={[0, -2, 0]} />
 
-      <Suspense fallback={null}>
-        {/* Connections */}
-        {scenario.connections.map((conn) => (
-          <DataFlow
-            key={conn.id}
-            from={getPosition(conn.from)}
-            to={getPosition(conn.to)}
-            color={step.packets.find(p => p.from === conn.from && p.to === conn.to)?.color ?? "blue"}
-            active={step.activeConnections.includes(conn.id)}
-            showPacket={step.activeConnections.includes(conn.id)}
-          />
-        ))}
+      {/* Connections */}
+      {scenario.connections.map((conn) => (
+        <DataFlow
+          key={conn.id}
+          from={getPosition(conn.from)}
+          to={getPosition(conn.to)}
+          color={step.packets.find(p => p.from === conn.from && p.to === conn.to)?.color ?? "blue"}
+          active={step.activeConnections.includes(conn.id)}
+          showPacket={step.activeConnections.includes(conn.id)}
+        />
+      ))}
 
-        {/* Components */}
-        {scenario.components.map((comp) => (
-          <ClusterComponent3D
-            key={comp.id}
-            id={comp.id}
-            label={comp.label}
-            type={comp.type}
-            description={comp.description}
-            position={comp.position}
-            active={step.activeComponents.includes(comp.id)}
-            onClick={onComponentClick}
-          />
-        ))}
-      </Suspense>
+      {/* Components */}
+      {scenario.components.map((comp) => (
+        <ClusterComponent3D
+          key={comp.id}
+          id={comp.id}
+          label={comp.label}
+          type={comp.type}
+          description={comp.description}
+          position={comp.position}
+          active={step.activeComponents.includes(comp.id)}
+          onClick={onComponentClick}
+        />
+      ))}
     </Canvas>
     </div>
   );
