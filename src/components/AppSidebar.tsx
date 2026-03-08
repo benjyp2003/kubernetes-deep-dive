@@ -51,6 +51,7 @@ const sections = [
     label: "Practice",
     items: [
       { title: "Troubleshooting", url: "/troubleshooting", icon: AlertTriangle },
+      { title: "Troubleshooting Lab", url: "/troubleshooting-lab", icon: Bug },
       { title: "Interactive Flows", url: "/flows", icon: Workflow },
       { title: "Visual Lab", url: "/visual-lab", icon: FlaskConical },
       { title: "3D Simulator", url: "/simulator", icon: Gamepad2 },
