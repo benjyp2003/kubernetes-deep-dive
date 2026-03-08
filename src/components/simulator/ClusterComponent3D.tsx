@@ -78,7 +78,7 @@ const ClusterComponent3D = ({ id, label, type, description, position, active, on
       case 'octahedron':
         return <octahedronGeometry args={[size[0]]} />;
       default:
-        return <roundedBoxGeometry args={[size[0], size[1], size[2], 4, 0.08]} />;
+        return <boxGeometry args={[size[0], size[1], size[2]]} />;
     }
   };
 

@@ -49,14 +49,7 @@ const DataFlow = ({ from, to, color, active, showPacket }: Props) => {
 
   return (
     <group>
-      <line ref={lineRef as any} geometry={lineGeo}>
-        <lineBasicMaterial
-          color={col}
-          transparent
-          opacity={active ? 0.6 : 0.08}
-          linewidth={1}
-        />
-      </line>
+      <primitive object={new THREE.Line(lineGeo, new THREE.LineBasicMaterial({ color: col, transparent: true, opacity: active ? 0.6 : 0.08 }))} />
 
       {showPacket && active && (
         <mesh ref={packetRef}>
