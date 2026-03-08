@@ -1,4 +1,4 @@
-import type { LabScenario } from "./types";
+import type { LabScenario } from "../types";
 
 const imagePullBackOff: LabScenario = {
   id: "image-pull-backoff",

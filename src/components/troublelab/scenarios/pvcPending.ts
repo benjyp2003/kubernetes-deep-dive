@@ -1,4 +1,4 @@
-import type { LabScenario } from "./types";
+import type { LabScenario } from "../types";
 
 const pvcPending: LabScenario = {
   id: "pvc-pending",
