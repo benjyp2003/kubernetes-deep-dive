@@ -52,6 +52,8 @@ const App = () => (
           <Route path="/operators" element={<Operators />} />
           <Route path="/openshift" element={<OpenShift />} />
           <Route path="/flows" element={<Flows />} />
+          <Route path="/visual-lab" element={<VisualLab />} />
+          <Route path="/visual-lab/:scenarioId" element={<VisualLabScenario />} />
           <Route path="/glossary" element={<Glossary />} />
           <Route path="/troubleshooting" element={<Troubleshooting />} />
           <Route path="*" element={<NotFound />} />
