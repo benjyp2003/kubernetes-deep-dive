@@ -1,7 +1,7 @@
 // 3D Kubernetes cluster component
 import { useRef, useState } from "react";
 import { useFrame } from "@react-three/fiber";
-import { Text, Html } from "@react-three/drei";
+import { Html } from "@react-three/drei";
 import * as THREE from "three";
 import type { ComponentType } from "./types";
 
@@ -124,18 +124,11 @@ const ClusterComponent3D = ({ id, label, type, description, position, active, on
       </mesh>
 
       {/* Label */}
-      <Text
-        position={[0, (shape === 'box' ? size[1] / 2 : size[0]) + 0.3, 0]}
-        fontSize={0.22}
-        color="white"
-        anchorX="center"
-        anchorY="bottom"
-        font="https://fonts.gstatic.com/s/spacegrotesk/v16/V8mDoQDjQSkFtoMM3T6r8E7mPbF4Cw.woff2"
-        outlineWidth={0.02}
-        outlineColor="#000000"
-      >
-        {label}
-      </Text>
+      <Html position={[0, (shape === 'box' ? size[1] / 2 : size[0]) + 0.35, 0]} center distanceFactor={10}>
+        <div className="px-2 py-1 rounded-md bg-background/80 border border-border backdrop-blur pointer-events-none">
+          <p className="text-[10px] text-foreground font-medium whitespace-nowrap">{label}</p>
+        </div>
+      </Html>
 
       {/* Tooltip on hover */}
       {hovered && (
