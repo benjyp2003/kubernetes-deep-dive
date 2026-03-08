@@ -110,7 +110,7 @@ const ClusterComponent3D = ({ id, label, type, description, position, active, on
         onPointerOver={(e) => { e.stopPropagation(); setHovered(true); document.body.style.cursor = 'pointer'; }}
         onPointerOut={() => { setHovered(false); document.body.style.cursor = 'auto'; }}
       >
-        {shape === 'box' ? <RoundedBoxGeometry /> : renderShape()}
+        {renderShape()}
         <meshStandardMaterial
           color={color}
           emissive={color}
