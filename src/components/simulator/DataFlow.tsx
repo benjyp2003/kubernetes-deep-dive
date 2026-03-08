@@ -19,7 +19,6 @@ interface Props {
 
 const DataFlow = ({ from, to, color, active, showPacket }: Props) => {
   const packetRef = useRef<THREE.Mesh>(null);
-  const lineRef = useRef<THREE.Line>(null);
 
   const points = useMemo(() => {
     const start = new THREE.Vector3(...from);
