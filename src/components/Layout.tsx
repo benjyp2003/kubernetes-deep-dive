@@ -16,10 +16,11 @@ const Layout = ({ children }: LayoutProps) => {
           <header className="h-14 flex items-center justify-between border-b border-border px-4 bg-background/80 backdrop-blur-sm sticky top-0 z-30">
             <div className="flex items-center gap-3">
               <SidebarTrigger className="text-muted-foreground hover:text-foreground" />
-              <span className="font-display font-bold text-sm text-foreground hidden sm:block">
-                K8s <span className="k8s-gradient-text">Deep Dive</span>
-              </span>
+              <span className="text-xs text-muted-foreground hidden sm:block">Created By Benjy Pfeffer</span>
             </div>
+            <span className="font-display font-bold text-sm text-foreground hidden sm:block">
+              K8s <span className="k8s-gradient-text">Deep Dive</span>
+            </span>
           </header>
           <main className="flex-1 overflow-y-auto">
             {children}
