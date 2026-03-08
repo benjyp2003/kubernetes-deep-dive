@@ -1,7 +1,7 @@
 import {
   Home, BookOpen, Server, Box, Layers, Network, HardDrive,
   Shield, Target, Tag, Settings, FolderTree, FileCode,
-  Globe, Puzzle, AlertTriangle, BookA, Workflow, HelpCircle, FlaskConical, Gamepad2
+  Globe, Puzzle, AlertTriangle, BookA, Workflow, HelpCircle, FlaskConical, Gamepad2, Bug
 } from "lucide-react";
 import { NavLink } from "@/components/NavLink";
 import { useLocation } from "react-router-dom";
