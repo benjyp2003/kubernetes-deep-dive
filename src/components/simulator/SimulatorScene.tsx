@@ -1,6 +1,5 @@
-import { Suspense } from "react";
 import { Canvas } from "@react-three/fiber";
-import { OrbitControls, Stars, PerspectiveCamera, Environment } from "@react-three/drei";
+import { OrbitControls, Stars, PerspectiveCamera } from "@react-three/drei";
 import ClusterComponent3D from "./ClusterComponent3D";
 import DataFlow from "./DataFlow";
 import type { SimulatorScenario } from "./types";
