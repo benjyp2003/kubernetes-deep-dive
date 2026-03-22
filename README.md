@@ -1,73 +1,166 @@
-# Welcome to your Lovable project
+# Kubernetes Deep Dive
 
-## Project info
+Interactive Kubernetes learning app built with React, TypeScript, Vite, Tailwind CSS, and shadcn/ui.
 
-**URL**: https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID
+## Run Locally
 
-## How can I edit this code?
+### Prerequisites
 
-There are several ways of editing your application.
+- Node.js 18 or newer
+- npm
 
-**Use Lovable**
-
-Simply visit the [Lovable Project](https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID) and start prompting.
-
-Changes made via Lovable will be committed automatically to this repo.
-
-**Use your preferred IDE**
-
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
-
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
-
-Follow these steps:
+You can verify your setup with:
 
 ```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
+node -v
+npm -v
+```
 
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
+### Install Dependencies
 
-# Step 3: Install the necessary dependencies.
-npm i
+```sh
+npm install --legacy-peer-deps
+```
 
-# Step 4: Start the development server with auto-reloading and an instant preview.
+### Start the Development Server
+
+```sh
 npm run dev
 ```
 
-**Edit a file directly in GitHub**
+By default, Vite tries to use:
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+```sh
+http://localhost:8080
+```
 
-**Use GitHub Codespaces**
+If port `8080` is already in use, Vite automatically picks the next available port such as `8081`.
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+### Stop the Development Server
 
-## What technologies are used for this project?
+When the dev server is running in your terminal, stop it with:
 
-This project is built with:
+```sh
+Ctrl + C
+```
 
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
+If PowerShell asks whether you want to terminate the batch job, press `Y` and then `Enter`.
 
-## How can I deploy this project?
+## Local Workflow
 
-Simply open [Lovable](https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID) and click on Share -> Publish.
+1. Open a terminal in the project folder.
+2. Install dependencies with `npm install --legacy-peer-deps`.
+3. Start the app with `npm run dev`.
+4. Open the local URL shown in the terminal.
+5. When you are done, return to the terminal and stop the server with `Ctrl + C`.
 
-## Can I connect a custom domain to my Lovable project?
+## Available Scripts
 
-Yes, you can!
+### Development
 
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
+```sh
+npm run dev
+```
 
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/features/custom-domain#custom-domain)
+Starts the Vite dev server with hot reload on port `8080`.
+
+### Production Build
+
+```sh
+npm run build
+```
+
+Creates an optimized production build.
+
+### Preview the Production Build
+
+```sh
+npm run preview
+```
+
+Serves the built app locally so you can verify the production output.
+
+### Lint
+
+```sh
+npm run lint
+```
+
+Runs ESLint across the project.
+
+### Tests
+
+```sh
+npm run test
+```
+
+Runs the test suite once with Vitest.
+
+```sh
+npm run test:watch
+```
+
+Runs Vitest in watch mode during development.
+
+## Project Structure
+
+```text
+src/
+  components/
+    learning/          Learning-page building blocks
+    simulator/         Simulator-specific UI
+    troublelab/        Troubleshooting lab UI
+    ui/                Shared shadcn/ui primitives
+    visuallab/         Visual lab components
+    AppSidebar.tsx     Main app navigation sidebar
+    Layout.tsx         Shared page layout wrapper
+    NavLink.tsx        Navigation link helper
+  hooks/
+    use-mobile.tsx     Mobile breakpoint helper
+    use-toast.ts       Toast state hook
+  lib/
+    utils.ts           Shared utility helpers
+  pages/               Route-level screens for each Kubernetes topic and lab
+  test/
+    setup.ts           Test environment setup
+    example.test.ts    Example Vitest test
+  App.tsx              Main route configuration
+  main.tsx             React app entry point
+  index.css            Global styles and Tailwind layers
+public/                 Static assets loaded directly by Vite
+package.json            Scripts and dependencies
+vite.config.ts          Vite dev server and alias config
+vitest.config.ts        Vitest configuration
+```
+
+### Pages and Routing
+
+The app uses `react-router-dom` in `src/App.tsx` and is organized as a multi-page learning experience. The `src/pages` folder contains the main topic pages such as:
+
+- `StartHere`
+- `Foundations`
+- `Architecture`
+- `Networking`
+- `Objects`
+- `Workloads`
+- `Services`
+- `Storage`
+- `Security`
+- `Scheduling`
+- `Labels`
+- `Config`
+- `Operators`
+- `OpenShift`
+- `Glossary`
+- `Troubleshooting`
+- interactive lab pages including `VisualLab`, `Simulator`, and `TroubleshootingLab`
+
+Each page is connected to a route like `/networking`, `/services`, or `/visual-lab/:scenarioId`.
+
+## Notes
+
+- The dev server is configured in `vite.config.ts` to use port `8080`.
+- `npm install` currently fails with a peer dependency conflict between `@react-three/drei` and `@react-three/fiber`, so `--legacy-peer-deps` is required for the current dependency set.
+- In Windows PowerShell, if you see an execution policy error for `npm`, run the same commands with `npm.cmd` instead.
+- `npm run dev` may also be written as `npm.cmd run dev` in PowerShell if needed.
+- This project includes both `package-lock.json` and Bun lockfiles, but the npm workflow above is the clearest default for local setup.
