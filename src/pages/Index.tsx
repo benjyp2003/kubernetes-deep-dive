@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import {
   BookOpen, Server, Box, Layers, Network, HardDrive, Shield, Target,
   FileCode, Globe, Puzzle, AlertTriangle, ArrowRight, Zap, Eye, Brain,
-  Compass, ChevronRight, Settings, Bug, FlaskConical, Gamepad2
+  Compass, ChevronRight, Settings, Bug, FlaskConical, Gamepad2, Hammer
 } from "lucide-react";
 import TopicCard from "@/components/learning/TopicCard";
 import Layout from "@/components/Layout";
@@ -143,11 +143,12 @@ const Index = () => {
             Interactive Practice Labs
           </h2>
           <p className="text-center text-muted-foreground mb-8">Hands-on environments to deepen your understanding</p>
-          <div className="grid sm:grid-cols-3 gap-4">
+          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
             {[
               { icon: Bug, title: "Troubleshooting Lab", desc: "Debug realistic Kubernetes failures using simulated kubectl commands.", to: "/troubleshooting-lab", color: "text-destructive", bg: "bg-destructive/10" },
               { icon: FlaskConical, title: "Visual Lab", desc: "Watch Kubernetes processes unfold step-by-step with interactive diagrams.", to: "/visual-lab", color: "text-primary", bg: "bg-primary/10" },
               { icon: Gamepad2, title: "3D Simulator", desc: "Explore cluster architecture in an interactive 3D environment.", to: "/simulator", color: "text-[hsl(var(--k8s-cyan))]", bg: "bg-[hsl(var(--k8s-cyan))]/10" },
+              { icon: Hammer, title: "Cluster Builder", desc: "Build a Kubernetes environment from zero — configure RBAC, networking, and storage.", to: "/cluster-builder", color: "text-emerald-400", bg: "bg-emerald-500/10" },
             ].map((item, i) => (
               <motion.div
                 key={i}

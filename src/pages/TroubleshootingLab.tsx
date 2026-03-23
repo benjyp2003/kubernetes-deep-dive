@@ -2,7 +2,7 @@ import { Link } from "react-router-dom";
 import Layout from "@/components/Layout";
 import { motion } from "framer-motion";
 import { labScenarios } from "@/components/troublelab/scenarios";
-import { Terminal, Shield, HardDrive, Network, Box, Settings } from "lucide-react";
+import { Terminal, Shield, HardDrive, Network, Box, Settings, Lock } from "lucide-react";
 
 const categoryConfig: Record<string, { icon: typeof Terminal; gradient: string }> = {
   pod: { icon: Box, gradient: "from-red-500/20 to-orange-500/20 border-red-500/30" },
@@ -10,6 +10,7 @@ const categoryConfig: Record<string, { icon: typeof Terminal; gradient: string }
   storage: { icon: HardDrive, gradient: "from-orange-500/20 to-amber-500/20 border-orange-500/30" },
   config: { icon: Settings, gradient: "from-violet-500/20 to-purple-500/20 border-violet-500/30" },
   deployment: { icon: Shield, gradient: "from-emerald-500/20 to-teal-500/20 border-emerald-500/30" },
+  security: { icon: Lock, gradient: "from-rose-500/20 to-pink-500/20 border-rose-500/30" },
 };
 
 const difficultyColors: Record<string, string> = {

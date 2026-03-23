@@ -28,6 +28,7 @@ import Simulator from "./pages/Simulator";
 import SimulatorScenarioPage from "./pages/SimulatorScenario";
 import TroubleshootingLab from "./pages/TroubleshootingLab";
 import TroubleshootingLabScenario from "./pages/TroubleshootingLabScenario";
+import ClusterBuilder from "./pages/ClusterBuilder";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -64,6 +65,7 @@ const App = () => (
           <Route path="/simulator/:scenarioId" element={<SimulatorScenarioPage />} />
           <Route path="/troubleshooting-lab" element={<TroubleshootingLab />} />
           <Route path="/troubleshooting-lab/:scenarioId" element={<TroubleshootingLabScenario />} />
+          <Route path="/cluster-builder" element={<ClusterBuilder />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>
