@@ -28,6 +28,7 @@ import Simulator from "./pages/Simulator";
 import SimulatorScenarioPage from "./pages/SimulatorScenario";
 import TroubleshootingLab from "./pages/TroubleshootingLab";
 import TroubleshootingLabScenario from "./pages/TroubleshootingLabScenario";
+import ClusterBuilder from "./pages/ClusterBuilder";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
