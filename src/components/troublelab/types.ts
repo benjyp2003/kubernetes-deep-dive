@@ -15,7 +15,7 @@ export interface LabCommand {
 export interface LabScenario {
   id: string;
   title: string;
-  category: 'pod' | 'networking' | 'storage' | 'config' | 'deployment';
+  category: 'pod' | 'networking' | 'storage' | 'config' | 'deployment' | 'security';
   difficulty: 'beginner' | 'intermediate' | 'advanced';
   icon: string;
   problemDescription: string;

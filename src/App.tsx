@@ -65,6 +65,7 @@ const App = () => (
           <Route path="/simulator/:scenarioId" element={<SimulatorScenarioPage />} />
           <Route path="/troubleshooting-lab" element={<TroubleshootingLab />} />
           <Route path="/troubleshooting-lab/:scenarioId" element={<TroubleshootingLabScenario />} />
+          <Route path="/cluster-builder" element={<ClusterBuilder />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>
