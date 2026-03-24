@@ -7,78 +7,101 @@ import CommonMistakes from "@/components/learning/CommonMistakes";
 import OpenShiftComparison from "@/components/learning/OpenShiftComparison";
 import CodeBlock from "@/components/learning/CodeBlock";
 import QuizCard from "@/components/learning/QuizCard";
+import FlowDiagram from "@/components/learning/FlowDiagram";
+import ConfigInternalFlows from "@/components/learning/config/ConfigInternalFlows";
+import ConfigSecretsDeepDive from "@/components/learning/config/ConfigSecretsDeepDive";
+import ConfigNamespaces from "@/components/learning/config/ConfigNamespaces";
+import ConfigDebugging from "@/components/learning/config/ConfigDebugging";
 
 const Config = () => {
   return (
     <Layout>
       <div className="max-w-4xl mx-auto px-4 md:px-6 py-8 space-y-8">
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="k8s-section-hero">
-          <span className="k8s-badge-intermediate mb-3 inline-block">Intermediate</span>
+          <span className="k8s-badge-intermediate mb-3 inline-block">Intermediate → Advanced</span>
           <h1 className="font-display text-3xl md:text-4xl font-bold">Configuration & Namespaces</h1>
           <p className="mt-3 text-sidebar-foreground/70 max-w-lg">
-            ConfigMaps, Secrets, environment variables, resource quotas, LimitRanges, and namespace organization strategies.
+            Deep dive into ConfigMaps, Secrets, environment variables, volume mounts — how configuration flows from etcd to your container, and how Kubernetes enforces it at every layer.
           </p>
         </motion.div>
 
+        {/* Layer 1: What & Why */}
         <LayeredExplanation
-          title="ConfigMaps and Secrets"
-          simple={<p>ConfigMaps store non-sensitive settings (like database URLs or feature flags). Secrets store sensitive data (like passwords or API keys). Both let you separate configuration from your application code.</p>}
+          title="ConfigMaps vs Secrets — Purpose & Differences"
+          simple={<p>ConfigMaps store non-sensitive settings (database URLs, feature flags). Secrets store sensitive data (passwords, API keys, TLS certificates). Both separate configuration from application code so you can change settings without rebuilding images.</p>}
           technical={
             <div className="space-y-3">
-              <p>ConfigMaps and Secrets are Kubernetes objects that store key-value pairs. They can be consumed by pods as:</p>
+              <p>Both are Kubernetes API objects stored in etcd. Key differences:</p>
               <ul className="list-disc list-inside space-y-1 ml-2">
-                <li><strong>Environment variables</strong> — injected into the container's env</li>
-                <li><strong>Volume mounts</strong> — mounted as files in the container</li>
-                <li><strong>Command arguments</strong> — used in container command/args</li>
+                <li><strong>ConfigMap</strong> — stored as plain text in etcd. No special handling.</li>
+                <li><strong>Secret</strong> — stored as base64-encoded data. Subject to RBAC restrictions, optional encryption at rest, and size limit of 1MB.</li>
+                <li><strong>base64 ≠ encryption</strong> — base64 is encoding (reversible by anyone). It exists so binary data (TLS certs, keys) can be stored in JSON/YAML.</li>
               </ul>
-              <p>Secrets are base64-encoded (not encrypted!) and have restricted access via RBAC.</p>
+              <p>Both can be consumed as environment variables, volume mounts, or command arguments.</p>
             </div>
           }
           deep={
             <div className="space-y-3">
-              <p>Secrets are stored in etcd. In production, enable etcd encryption at rest. Secrets can be of different types: Opaque (generic), kubernetes.io/tls (TLS certs), kubernetes.io/dockerconfigjson (image pull secrets).</p>
-              <p>Volume-mounted ConfigMaps/Secrets are updated automatically by kubelet when the source changes (with a delay). Environment variables are NOT updated — the pod must be restarted.</p>
+              <p><strong>Why base64 and not encryption?</strong> Kubernetes stores all objects in etcd as JSON. Binary data (like TLS certificates) can't be embedded in JSON directly — base64 encodes binary to text. Encryption is a separate concern handled by etcd encryption at rest (EncryptionConfiguration).</p>
+              <p><strong>Secret types</strong> control validation: <code className="font-mono text-xs">Opaque</code> (generic), <code className="font-mono text-xs">kubernetes.io/tls</code> (requires tls.crt + tls.key), <code className="font-mono text-xs">kubernetes.io/dockerconfigjson</code> (image pull), <code className="font-mono text-xs">kubernetes.io/service-account-token</code> (auto-generated SA tokens).</p>
+              <p><strong>Immutable ConfigMaps/Secrets</strong> (field: <code className="font-mono text-xs">immutable: true</code>) prevent modifications and reduce API server load since kubelet stops watching them.</p>
             </div>
           }
         />
 
+        <AnalogyCallout
+          analogy="ConfigMap = public bulletin board, Secret = locked filing cabinet"
+          explanation="Both store information for your apps. ConfigMaps are like a bulletin board anyone can read — settings, URLs, feature flags. Secrets are like a locked cabinet — only authorized people (RBAC) can open it, and the contents are encoded (base64) to handle binary data. But the lock (RBAC) is what provides security, not the encoding."
+        />
+
+        {/* Internal Flows — the deep system-level section */}
+        <ConfigInternalFlows />
+
         <ComparisonTable
-          title="Environment Variables vs Volume Mounts"
+          title="Environment Variables vs Volume Mounts — Deep Comparison"
           headers={["Aspect", "Env Variables", "Volume Mount"]}
           rows={[
-            { label: "Format", values: ["Key-value pairs", "Files in a directory"] },
-            { label: "Auto-update", values: ["No — requires pod restart", "Yes — kubelet syncs (with delay)"] },
+            { label: "Injection time", values: ["Container start only", "Continuous (kubelet syncs)"] },
+            { label: "Auto-update", values: ["❌ Never — requires pod restart", "✅ Yes — kubelet syncs (~60-120s delay)"] },
+            { label: "Mechanism", values: ["Passed to container runtime via OCI spec", "kubelet writes files to node, mounts into container"] },
             { label: "Best for", values: ["Simple values (DB_HOST, PORT)", "Config files (nginx.conf, app.yaml)"] },
-            { label: "Visibility", values: ["Visible in process env", "Visible as files in the container"] },
+            { label: "Security", values: ["Visible in /proc/1/environ, may leak in logs", "File permissions can be set, less exposure"] },
+            { label: "Subpath mount", values: ["N/A", "Single file mount possible, but breaks auto-update"] },
           ]}
         />
 
         <CodeBlock
-          title="ConfigMap + Secret Usage"
+          title="ConfigMap + Secret — Complete Usage Pattern"
           language="yaml"
-          code={`# ConfigMap
+          code={`# ConfigMap with both key-value and file data
 apiVersion: v1
 kind: ConfigMap
 metadata:
   name: app-config
+  namespace: production
 data:
-  DATABASE_HOST: "postgres.default.svc"
+  DATABASE_HOST: "postgres.default.svc.cluster.local"
   LOG_LEVEL: "info"
   app.properties: |
     feature.x.enabled=true
     cache.ttl=300
+    max.connections=50
 ---
-# Secret
+# Secret with stringData (auto-encoded to base64)
 apiVersion: v1
 kind: Secret
 metadata:
   name: app-secrets
+  namespace: production
 type: Opaque
-stringData:
+stringData:          # <-- stringData accepts plain text
   DATABASE_PASSWORD: "s3cret!"
   API_KEY: "abc123xyz"
+# After creation, 'data' field shows base64:
+# data:
+#   DATABASE_PASSWORD: czNjcmV0IQ==
 ---
-# Pod using both
+# Pod consuming both via env vars AND volume mounts
 apiVersion: v1
 kind: Pod
 metadata:
@@ -88,108 +111,102 @@ spec:
     - name: app
       image: myapp:1.0
       env:
+        # Single key from ConfigMap
         - name: DB_HOST
           valueFrom:
             configMapKeyRef:
               name: app-config
               key: DATABASE_HOST
+        # Single key from Secret
         - name: DB_PASS
           valueFrom:
             secretKeyRef:
               name: app-secrets
               key: DATABASE_PASSWORD
+        # ALL keys from ConfigMap as env vars
+      envFrom:
+        - configMapRef:
+            name: app-config
       volumeMounts:
-        - name: config-files
+        # Mount ConfigMap as files
+        - name: config-volume
           mountPath: /etc/config
+          readOnly: true
+        # Mount Secret as files
+        - name: secret-volume
+          mountPath: /etc/secrets
+          readOnly: true
   volumes:
-    - name: config-files
+    - name: config-volume
       configMap:
-        name: app-config`}
+        name: app-config
+        # Optional: specific keys + file permissions
+        items:
+          - key: app.properties
+            path: app.properties
+            mode: 0644
+    - name: secret-volume
+      secret:
+        secretName: app-secrets
+        defaultMode: 0400  # Restrictive permissions`}
         />
 
-        <LayeredExplanation
-          title="Namespaces"
-          simple={<p>Namespaces are like folders for your Kubernetes objects. They let you organize resources and control who can access what. Different teams or environments can use different namespaces.</p>}
-          technical={
-            <div className="space-y-3">
-              <p>Namespaces provide a scope for resource names and a boundary for RBAC policies, ResourceQuotas, and LimitRanges. Default namespaces: <code className="font-mono text-xs">default</code>, <code className="font-mono text-xs">kube-system</code>, <code className="font-mono text-xs">kube-public</code>, <code className="font-mono text-xs">kube-node-lease</code>.</p>
-              <p>Some resources are cluster-scoped (Nodes, PVs, ClusterRoles) and don't belong to any namespace.</p>
-            </div>
-          }
-          deep={
-            <div className="space-y-3">
-              <p>Namespaces enable multitenancy patterns. Combined with RBAC, NetworkPolicies, and ResourceQuotas, they provide isolation between teams. However, namespaces alone don't provide security — you must add RBAC and network policies for true isolation.</p>
-            </div>
-          }
-        />
+        {/* Secrets Deep Dive */}
+        <ConfigSecretsDeepDive />
 
-        <CodeBlock
-          title="ResourceQuota and LimitRange"
-          language="yaml"
-          code={`# ResourceQuota — limits total namespace usage
-apiVersion: v1
-kind: ResourceQuota
-metadata:
-  name: team-quota
-  namespace: team-a
-spec:
-  hard:
-    pods: "20"
-    requests.cpu: "10"
-    requests.memory: "20Gi"
-    limits.cpu: "20"
-    limits.memory: "40Gi"
----
-# LimitRange — sets defaults per pod/container
-apiVersion: v1
-kind: LimitRange
-metadata:
-  name: default-limits
-  namespace: team-a
-spec:
-  limits:
-    - default:
-        cpu: 500m
-        memory: 256Mi
-      defaultRequest:
-        cpu: 100m
-        memory: 128Mi
-      type: Container`}
-        />
-
-        <AnalogyCallout
-          analogy="Namespaces are like apartments in a building"
-          explanation="Each apartment (namespace) has its own space, keys (RBAC), and utility budget (ResourceQuota). Tenants can't access each other's apartments without permission. The building manager (cluster admin) oversees everything."
-        />
+        {/* Namespaces */}
+        <ConfigNamespaces />
 
         <OpenShiftComparison
-          k8sFeature="Namespaces"
-          openshiftFeature="Projects"
-          description="OpenShift Projects are namespaces with extra features: default RBAC, default node selectors, network isolation, and self-service project creation/deletion via 'oc new-project'. Every Project is a namespace, but with additional metadata and defaults."
+          k8sFeature="Namespaces + ConfigMaps/Secrets"
+          openshiftFeature="Projects + DeploymentConfig env injection"
+          description="OpenShift Projects wrap namespaces with default RBAC and network isolation. OpenShift also supports 'oc set env' for quick ConfigMap/Secret injection into DeploymentConfigs. OpenShift's integrated image registry uses Secrets for pull credentials automatically."
         />
 
-        <CommonMistakes
-          mistakes={[
-            { mistake: "Putting everything in the default namespace", correction: "Organize by team, environment, or application. It's hard to manage RBAC and quotas in a single namespace." },
-            { mistake: "Expecting Secrets to be encrypted", correction: "Secrets are only base64-encoded. Enable etcd encryption at rest and use external secret managers for production." },
-            { mistake: "Not setting resource requests/limits", correction: "Without limits, one pod can consume all node resources. Without requests, the scheduler can't make good decisions." },
-          ]}
-        />
+        {/* Debugging */}
+        <ConfigDebugging />
 
         <QuizCard
-          title="Config & Namespaces Quiz"
+          title="Configuration Deep Dive Quiz"
           questions={[
             {
-              question: "What happens to a ConfigMap mounted as a volume when the ConfigMap is updated?",
-              options: ["Nothing — requires pod restart", "The mounted files are eventually updated", "The pod crashes", "The volume is unmounted"],
+              question: "A ConfigMap mounted as a volume is updated. What happens?",
+              options: [
+                "Nothing — requires pod restart",
+                "kubelet eventually syncs the new data (60-120s delay)",
+                "The pod crashes and restarts automatically",
+                "The container runtime hot-reloads the config",
+              ],
               correctIndex: 1,
-              explanation: "Volume-mounted ConfigMaps are synced by kubelet with a delay (default ~1 minute). Environment variables from ConfigMaps are NOT updated without a restart."
+              explanation: "kubelet periodically checks for ConfigMap changes and updates mounted volumes. The delay is configurable (--sync-frequency). Note: subPath mounts do NOT receive updates."
+            },
+            {
+              question: "Why are Secrets base64-encoded instead of encrypted?",
+              options: [
+                "base64 is a form of encryption",
+                "To save storage space in etcd",
+                "To allow binary data (certs, keys) to be stored in JSON/YAML",
+                "For backward compatibility with Docker",
+              ],
+              correctIndex: 2,
+              explanation: "base64 is encoding, not encryption. It converts binary data to text so it can be stored in JSON/YAML (which are text formats). Encryption is handled separately via etcd encryption at rest."
+            },
+            {
+              question: "Why is mounting Secrets as files safer than env vars?",
+              options: [
+                "Files are encrypted, env vars are not",
+                "Env vars appear in /proc/1/environ and may leak in logs, crash dumps, or child processes",
+                "Volume mounts are faster",
+                "Files are only readable by root",
+              ],
+              correctIndex: 1,
+              explanation: "Environment variables are visible in /proc/1/environ (readable by anyone with access to the container), can leak in logs (env dump), crash reports, and are inherited by child processes. Files can have restrictive permissions (0400) and don't leak through these channels."
             },
             {
               question: "Which resources are NOT namespace-scoped?",
               options: ["Pods and Services", "Nodes and PersistentVolumes", "ConfigMaps and Secrets", "Deployments and ReplicaSets"],
               correctIndex: 1,
-              explanation: "Nodes and PersistentVolumes are cluster-scoped resources — they exist outside of any namespace."
+              explanation: "Nodes and PersistentVolumes are cluster-scoped — they exist outside any namespace. Use 'kubectl api-resources --namespaced=false' to see all cluster-scoped resources."
             },
           ]}
         />
