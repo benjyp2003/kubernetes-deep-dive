@@ -118,10 +118,7 @@ spec:
         {/* Section 4: Annotations Deep Dive */}
         <AnnotationsDeepDive />
 
-        {/* Section 5: Taints Deep Dive */}
-        <TaintsDeepDive />
-
-        {/* Section 6: How They All Connect */}
+        {/* Section 5: How They All Connect */}
         <FlowDiagram
           title="How Labels, Selectors, Annotations & Taints Work Together"
           steps={[

@@ -84,6 +84,8 @@ const Scheduling = () => {
           }
         />
 
+        <TaintsDeepDive />
+
         <CodeBlock
           title="Node Affinity Example"
           language="yaml"
