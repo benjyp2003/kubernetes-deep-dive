@@ -6,130 +6,180 @@ import ComparisonTable from "@/components/learning/ComparisonTable";
 import CommonMistakes from "@/components/learning/CommonMistakes";
 import CodeBlock from "@/components/learning/CodeBlock";
 import QuizCard from "@/components/learning/QuizCard";
+import FlowDiagram from "@/components/learning/FlowDiagram";
+import LabelsInternalFlows from "@/components/learning/labels/LabelsInternalFlows";
+import SelectorsDeepDive from "@/components/learning/labels/SelectorsDeepDive";
+import AnnotationsDeepDive from "@/components/learning/labels/AnnotationsDeepDive";
+import TaintsDeepDive from "@/components/learning/labels/TaintsDeepDive";
+import LabelsDebugging from "@/components/learning/labels/LabelsDebugging";
 
 const Labels = () => {
   return (
     <Layout>
       <div className="max-w-4xl mx-auto px-4 md:px-6 py-8 space-y-8">
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="k8s-section-hero">
-          <span className="k8s-badge-beginner mb-3 inline-block">Beginner → Intermediate</span>
-          <h1 className="font-display text-3xl md:text-4xl font-bold">Labels, Selectors & Taints</h1>
+          <span className="k8s-badge-intermediate mb-3 inline-block">Intermediate → Advanced</span>
+          <h1 className="font-display text-3xl md:text-4xl font-bold">Labels, Selectors, Annotations & Taints</h1>
           <p className="mt-3 text-sidebar-foreground/70 max-w-lg">
-            The metadata system that makes Kubernetes work — how objects find each other, how services route traffic, and how nodes control placement.
+            The metadata system that makes Kubernetes work — how objects find each other, how controllers enforce behavior, and how the scheduler controls placement. These four mechanisms are the glue of the entire system.
           </p>
         </motion.div>
 
+        {/* Section 1: Labels Core */}
         <LayeredExplanation
-          title="Labels"
+          title="Labels — Identity & Grouping"
           simple={<p>Labels are sticky notes you put on Kubernetes objects. They're key-value pairs like <code className="text-primary font-mono text-xs bg-primary/10 px-1.5 py-0.5 rounded">app: frontend</code>. Other objects use these labels to find and group things together.</p>}
           technical={
             <div className="space-y-3">
-              <p>Labels are arbitrary key-value pairs attached to objects. They are used by <strong>selectors</strong> to identify sets of objects. Services find pods via selectors. Deployments manage ReplicaSets via selectors. Labels are the glue that connects Kubernetes objects.</p>
+              <p>Labels are arbitrary key-value pairs in <code className="text-primary font-mono text-xs bg-primary/10 px-1 rounded">metadata.labels</code>. They are the <strong>primary mechanism</strong> for object identification in Kubernetes. Services, Deployments, NetworkPolicies, and the scheduler all use labels to find their targets.</p>
+              <p>Label keys have an optional prefix (DNS subdomain, max 253 chars) and a name (max 63 chars). Values are max 63 chars. These limits exist because labels are indexed for fast lookups.</p>
             </div>
           }
           deep={
             <div className="space-y-3">
-              <p>Labels are stored in the object's metadata and indexed by the API server for efficient querying. Label selectors support equality-based (=, !=) and set-based (in, notin, exists) matching. The API server uses these for filtering in list/watch operations.</p>
+              <p>The API Server maintains an <strong>in-memory label index</strong> for every resource type. When a controller issues a list request with a label selector, the API Server uses this index instead of scanning all objects — this is O(1) lookup, not O(n) scan.</p>
+              <p>Labels are stored in etcd as part of the object's metadata. Every label change triggers a <strong>watch event</strong> to all controllers watching that resource type. Controllers then re-evaluate their selectors against the updated labels.</p>
+              <p className="text-xs text-muted-foreground">This is why Kubernetes is called "declarative" — you don't tell a Service which Pods to use. You declare labels on Pods, and the system continuously matches them.</p>
             </div>
           }
         />
 
+        <AnalogyCallout
+          analogy="Labels are airport luggage tags — Annotations are the notes inside your bag — Taints are 'Staff Only' signs"
+          explanation="At an airport, luggage tags (labels) are read by the sorting system (selectors) to route bags to the right flight (Service). The notes inside your bag (annotations) contain useful info but aren't used for routing. 'Staff Only' signs at gates (taints) block everyone except authorized personnel (pods with tolerations). Change a tag → your bag goes to a different flight. That's exactly what happens in Kubernetes."
+        />
+
         <ComparisonTable
-          title="Labels vs Annotations vs Taints"
+          title="Labels vs Annotations vs Taints — System Role"
           headers={["Feature", "Labels", "Annotations", "Taints"]}
           rows={[
-            { label: "Purpose", values: ["Identify & select objects", "Store non-identifying metadata", "Repel pods from nodes"] },
-            { label: "Used by selectors?", values: ["Yes", "No", "No (use tolerations)"] },
+            { label: "Purpose", values: ["Identify & select objects", "Store metadata for tools/controllers", "Repel pods from nodes"] },
+            { label: "Used by selectors?", values: ["Yes — indexed for fast lookup", "No — not indexed", "No — uses tolerations"] },
             { label: "Where applied", values: ["Any object", "Any object", "Nodes only"] },
-            { label: "Example use", values: ["Service → Pod matching", "Build info, tool configs", "Dedicate GPU nodes"] },
-            { label: "Size limits", values: ["63 chars value, 253 prefix", "256KB total", "Key-value + effect"] },
+            { label: "Who reads them?", values: ["API Server, controllers, scheduler", "External tools, operators, kubectl", "Scheduler, node controller"] },
+            { label: "Size limits", values: ["63 chars value, 253 prefix", "256KB total per object", "Key=value + effect"] },
+            { label: "Dynamic effect", values: ["Changing labels immediately affects selectors", "Controllers must explicitly watch for changes", "New taints can evict running pods (NoExecute)"] },
           ]}
         />
 
-        <AnalogyCallout
-          analogy="Labels are like tags on luggage"
-          explanation="At an airport, luggage tags (labels) help the sorting system (selectors) route your bags to the right flight (service). Annotations are like the notes inside your bag — useful info but not used for routing. Taints are like 'staff only' signs at gates — only authorized personnel (tolerated pods) can enter."
-        />
-
         <CodeBlock
-          title="Labels and Selectors in Action"
+          title="Labels, Selectors & Annotations — Complete Example"
           language="yaml"
-          code={`# Deployment with labels
-apiVersion: apps/v1
+          code={`apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: web-app
-  labels:
-    app: web-app         # Label on the Deployment itself
+  labels:                          # Labels ON the Deployment object itself
+    app: web-app
     tier: frontend
+  annotations:                     # Annotations — controller metadata
+    deployment.kubernetes.io/revision: "3"
+    kubectl.kubernetes.io/last-applied-configuration: "{...}"
 spec:
   selector:
     matchLabels:
-      app: web-app       # Selector: find pods with this label
+      app: web-app                 # Selector: finds Pods with this label
   template:
     metadata:
       labels:
-        app: web-app     # Pods get this label
+        app: web-app               # Pods get this label (must match selector)
         tier: frontend
         version: v2
+      annotations:
+        prometheus.io/scrape: "true"   # Prometheus reads this
+        prometheus.io/port: "8080"
     spec:
+      tolerations:                 # Taints this pod can handle
+        - key: "dedicated"
+          operator: "Equal"
+          value: "frontend"
+          effect: "NoSchedule"
       containers:
         - name: web
           image: nginx:1.25
 ---
-# Service that finds pods by label
 apiVersion: v1
 kind: Service
 metadata:
   name: web-svc
 spec:
   selector:
-    app: web-app         # Routes traffic to pods with app=web-app
+    app: web-app                   # Dynamic match → EndpointSlice → routing
   ports:
     - port: 80`}
         />
 
-        <div className="k8s-card">
-          <h3 className="font-display font-semibold text-lg text-foreground mb-4">How Selectors Connect Objects</h3>
-          <div className="space-y-4">
-            {[
-              { from: "Service", to: "Pods", via: "spec.selector matches pod labels", example: "Service selector {app: web} → finds pods with label app=web" },
-              { from: "Deployment", to: "ReplicaSet", via: "spec.selector.matchLabels", example: "Deployment manages ReplicaSets matching its selector" },
-              { from: "ReplicaSet", to: "Pods", via: "spec.selector.matchLabels", example: "ReplicaSet owns pods matching its selector" },
-              { from: "NetworkPolicy", to: "Pods", via: "spec.podSelector", example: "Policy applies to pods matching the selector" },
-            ].map((item, i) => (
-              <div key={i} className="flex items-center gap-3 text-sm">
-                <span className="font-mono text-xs bg-primary/10 text-primary px-2 py-1 rounded">{item.from}</span>
-                <span className="text-muted-foreground">→</span>
-                <span className="font-mono text-xs bg-primary/10 text-primary px-2 py-1 rounded">{item.to}</span>
-                <span className="text-muted-foreground text-xs flex-1">via {item.via}</span>
-              </div>
-            ))}
-          </div>
-        </div>
+        {/* Section 2: Internal Flows */}
+        <LabelsInternalFlows />
 
-        <CommonMistakes
-          mistakes={[
-            { mistake: "Confusing labels with annotations", correction: "Labels are for selection and identification. Annotations are for metadata that doesn't affect selection." },
-            { mistake: "Service selector doesn't match any pods", correction: "If labels don't match exactly, the Service has zero endpoints and traffic goes nowhere." },
-            { mistake: "Thinking taints work like negative labels", correction: "Taints actively repel pods. Labels just describe objects. Taints need tolerations to allow scheduling." },
+        {/* Section 3: Selectors Deep Dive */}
+        <SelectorsDeepDive />
+
+        {/* Section 4: Annotations Deep Dive */}
+        <AnnotationsDeepDive />
+
+        {/* Section 5: Taints Deep Dive */}
+        <TaintsDeepDive />
+
+        {/* Section 6: How They All Connect */}
+        <FlowDiagram
+          title="How Labels, Selectors, Annotations & Taints Work Together"
+          steps={[
+            { label: "Labels", description: "Define object identity (app=web, tier=frontend)", icon: "🏷️" },
+            { label: "Selectors", description: "Create dynamic relationships between objects", icon: "🔍" },
+            { label: "Annotations", description: "Signal controllers to change behavior", icon: "📝" },
+            { label: "Taints/Tolerations", description: "Control which nodes accept which pods", icon: "🚫" },
+            { label: "System Behavior", description: "Routing, management, monitoring, scheduling", icon: "⚙️" },
           ]}
         />
 
+        <CommonMistakes
+          mistakes={[
+            { mistake: "Thinking Services are linked to Pods by name", correction: "Services find Pods via label selectors. Change the label → the Pod disappears from the Service's endpoints immediately." },
+            { mistake: "Using annotations where labels should be used", correction: "If you need to SELECT objects by a value, use labels. Annotations cannot be used in selectors — they're not indexed." },
+            { mistake: "Confusing NoSchedule with NoExecute", correction: "NoSchedule only affects NEW pods (existing stay). NoExecute evicts EXISTING pods too — much more disruptive." },
+            { mistake: "Trying to change a Deployment's selector", correction: "Deployment selectors are immutable after creation. You must delete and recreate the Deployment to change its selector." },
+            { mistake: "Forgetting that label changes are immediate", correction: "Removing a label from a Pod instantly removes it from any Service/NetworkPolicy that selected it. There's no delay or confirmation." },
+            { mistake: "Using wrong annotation format", correction: "Annotations are controller-specific. 'true' vs true vs 'True' matters. Always check controller docs for exact format." },
+          ]}
+        />
+
+        {/* Section 7: Debugging */}
+        <LabelsDebugging />
+
+        {/* Section 8: Quiz */}
         <QuizCard
-          title="Labels & Selectors Quiz"
+          title="Labels, Selectors, Annotations & Taints — Deep Quiz"
           questions={[
             {
-              question: "A Service has selector {app: api}. Which pods will receive traffic?",
-              options: ["All pods in the namespace", "Pods with label app=api", "Pods named 'api'", "Pods in the 'api' deployment"],
+              question: "A Service has selector {app: api} but no Pods have that label. What happens?",
+              options: ["Service returns 503 errors", "Service has 0 endpoints — connection refused", "Service creates Pods automatically", "Kubernetes warns but routes to all Pods"],
               correctIndex: 1,
-              explanation: "Services use label selectors to find target pods. Only pods with the exact matching label app=api will be included in the Service's endpoints."
+              explanation: "The EndpointSlice controller finds no Pods matching the selector, so the Service has zero endpoints. Any traffic to the ClusterIP gets 'Connection refused' because there's nowhere to route it."
             },
             {
-              question: "Can annotations be used in selectors?",
-              options: ["Yes, same as labels", "No, annotations are not indexed for selection", "Only in Services", "Only in NetworkPolicies"],
+              question: "You remove the label 'app=web' from a running Pod. What happens to the Pod?",
+              options: ["Pod is deleted", "Pod keeps running but is removed from its Service and ReplicaSet creates a replacement", "Nothing changes", "Pod restarts"],
               correctIndex: 1,
-              explanation: "Annotations cannot be used in selectors. They store non-identifying metadata like build info or tool configurations."
+              explanation: "The Pod keeps running (labels don't affect pod lifecycle). But the ReplicaSet loses track of it (selector no longer matches), creates a replacement, and the Service removes it from endpoints."
+            },
+            {
+              question: "What's the key difference between NoSchedule and NoExecute taints?",
+              options: ["NoSchedule is permanent, NoExecute is temporary", "NoSchedule affects new pods only, NoExecute also evicts existing pods", "NoSchedule is for nodes, NoExecute is for pods", "They are identical"],
+              correctIndex: 1,
+              explanation: "NoSchedule only prevents NEW pods from being scheduled. NoExecute actively evicts pods already running on the node if they don't tolerate the taint."
+            },
+            {
+              question: "Can you filter objects by annotations using kubectl?",
+              options: ["Yes, with -l flag", "Yes, with --annotation flag", "No — annotations are not indexed for selection", "Only for Pods"],
+              correctIndex: 2,
+              explanation: "Annotations are NOT indexed by the API Server. You cannot use them in selectors or filter by them in list queries. Only labels are indexed for selection."
+            },
+            {
+              question: "A node has taint 'gpu=true:NoSchedule'. A pod has toleration {key: gpu, operator: Exists, effect: NoSchedule}. Can it schedule?",
+              options: ["No — value must match", "Yes — Exists operator matches any value", "Only if the pod requests GPU resources", "Only with PreferNoSchedule"],
+              correctIndex: 1,
+              explanation: "The Exists operator matches any taint with the matching key and effect, regardless of value. This is useful when you want to tolerate all taints with a specific key."
             },
           ]}
         />
