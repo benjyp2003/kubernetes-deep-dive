@@ -7,6 +7,7 @@ import ComparisonTable from "@/components/learning/ComparisonTable";
 import CommonMistakes from "@/components/learning/CommonMistakes";
 import CodeBlock from "@/components/learning/CodeBlock";
 import QuizCard from "@/components/learning/QuizCard";
+import TaintsDeepDive from "@/components/learning/labels/TaintsDeepDive";
 
 const Scheduling = () => {
   return (
