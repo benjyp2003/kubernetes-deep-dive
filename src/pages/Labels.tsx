@@ -10,7 +10,7 @@ import FlowDiagram from "@/components/learning/FlowDiagram";
 import LabelsInternalFlows from "@/components/learning/labels/LabelsInternalFlows";
 import SelectorsDeepDive from "@/components/learning/labels/SelectorsDeepDive";
 import AnnotationsDeepDive from "@/components/learning/labels/AnnotationsDeepDive";
-import TaintsDeepDive from "@/components/learning/labels/TaintsDeepDive";
+
 import LabelsDebugging from "@/components/learning/labels/LabelsDebugging";
 
 const Labels = () => {
