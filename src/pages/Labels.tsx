@@ -19,7 +19,7 @@ const Labels = () => {
       <div className="max-w-4xl mx-auto px-4 md:px-6 py-8 space-y-8">
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="k8s-section-hero">
           <span className="k8s-badge-intermediate mb-3 inline-block">Intermediate → Advanced</span>
-          <h1 className="font-display text-3xl md:text-4xl font-bold">Labels, Selectors, Annotations & Taints</h1>
+          <h1 className="font-display text-3xl md:text-4xl font-bold">Labels, Selectors & Annotations</h1>
           <p className="mt-3 text-sidebar-foreground/70 max-w-lg">
             The metadata system that makes Kubernetes work — how objects find each other, how controllers enforce behavior, and how the scheduler controls placement. These four mechanisms are the glue of the entire system.
           </p>
