@@ -1,13 +1,16 @@
 import Layout from "@/components/Layout";
 import { motion } from "framer-motion";
-import LayeredExplanation from "@/components/learning/LayeredExplanation";
-import FlowDiagram from "@/components/learning/FlowDiagram";
 import AnalogyCallout from "@/components/learning/AnalogyCallout";
 import ComparisonTable from "@/components/learning/ComparisonTable";
-import CommonMistakes from "@/components/learning/CommonMistakes";
 import OpenShiftComparison from "@/components/learning/OpenShiftComparison";
 import CodeBlock from "@/components/learning/CodeBlock";
 import QuizCard from "@/components/learning/QuizCard";
+import FlowDiagram from "@/components/learning/FlowDiagram";
+import LayeredExplanation from "@/components/learning/LayeredExplanation";
+import DNSWiring from "@/components/learning/dns/DNSWiring";
+import CoreDNSInternals from "@/components/learning/dns/CoreDNSInternals";
+import DNSServiceRelationship from "@/components/learning/dns/DNSServiceRelationship";
+import DNSDebugging from "@/components/learning/dns/DNSDebugging";
 
 const Services = () => {
   return (
@@ -17,10 +20,11 @@ const Services = () => {
           <span className="k8s-badge-intermediate mb-3 inline-block">Intermediate → Advanced</span>
           <h1 className="font-display text-3xl md:text-4xl font-bold">Services, DNS & Ingress</h1>
           <p className="mt-3 text-sidebar-foreground/70 max-w-lg">
-            How pods are discovered, how traffic gets routed, and how external users reach your applications inside the cluster.
+            How pods are discovered, how traffic gets routed, how DNS works internally, and how external users reach your applications inside the cluster.
           </p>
         </motion.div>
 
+        {/* --- Services Core --- */}
         <LayeredExplanation
           title="What is a Service?"
           simple={
@@ -56,29 +60,24 @@ const Services = () => {
           ]}
         />
 
-        <LayeredExplanation
-          title="DNS in Kubernetes"
-          simple={
-            <p>Kubernetes has a built-in DNS server (CoreDNS). When a pod wants to talk to a service called "backend", it just uses the name "backend" and DNS resolves it to the right IP automatically.</p>
-          }
-          technical={
-            <div className="space-y-3">
-              <p>CoreDNS runs as a Deployment in the <code className="text-primary font-mono text-xs bg-primary/10 px-1.5 py-0.5 rounded">kube-system</code> namespace. Every pod's /etc/resolv.conf is configured to point to the CoreDNS service.</p>
-              <p>DNS naming convention:</p>
-              <ul className="list-disc list-inside space-y-1 ml-2 text-sm">
-                <li><strong>Service:</strong> my-svc.my-namespace.svc.cluster.local</li>
-                <li><strong>Pod:</strong> pod-ip.my-namespace.pod.cluster.local</li>
-                <li><strong>Short name:</strong> Within same namespace, just use "my-svc"</li>
-              </ul>
-            </div>
-          }
-          deep={
-            <div className="space-y-3">
-              <p>CoreDNS watches the API server for Service and Endpoint changes and updates its DNS records accordingly. It uses the kubernetes plugin to serve cluster DNS and can be configured with custom zones, forwarding rules, and caching policies via its Corefile ConfigMap.</p>
-              <p>Headless services (ClusterIP: None) return individual pod IPs instead of a single virtual IP — used by StatefulSets for stable DNS names per pod.</p>
-            </div>
-          }
-        />
+        {/* --- DNS Deep Dive --- */}
+        <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="k8s-section-hero">
+          <span className="k8s-badge-advanced mb-3 inline-block">Deep Dive</span>
+          <h2 className="font-display text-2xl md:text-3xl font-bold">Kubernetes DNS — System-Level Deep Dive</h2>
+          <p className="mt-3 text-sidebar-foreground/70 max-w-lg">
+            How DNS is wired into the cluster, how CoreDNS works internally, and how to debug DNS failures.
+          </p>
+        </motion.div>
+
+        <DNSWiring />
+        <CoreDNSInternals />
+        <DNSServiceRelationship />
+
+        {/* --- Ingress --- */}
+        <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="k8s-section-hero">
+          <span className="k8s-badge-intermediate mb-3 inline-block">External Access</span>
+          <h2 className="font-display text-2xl md:text-3xl font-bold">Ingress & External Traffic</h2>
+        </motion.div>
 
         <FlowDiagram
           title="External Traffic → Ingress → Service → Pod"
@@ -142,17 +141,17 @@ spec:
     termination: edge`}
         />
 
-        <CommonMistakes
-          mistakes={[
-            { mistake: "Service selector doesn't match pod labels", correction: "The Service selector must exactly match labels on the target pods. Use kubectl get endpoints to verify." },
-            { mistake: "Forgetting to deploy an Ingress Controller", correction: "Ingress resources do nothing without a running Ingress Controller (nginx-ingress, traefik, etc.)." },
-            { mistake: "Using NodePort in production", correction: "NodePort exposes on every node's IP. Use LoadBalancer or Ingress for production external access." },
-            { mistake: "Not understanding headless services", correction: "Setting ClusterIP: None creates a headless service — DNS returns individual pod IPs. Required for StatefulSets." },
-          ]}
-        />
+        {/* --- DNS Debugging --- */}
+        <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="k8s-section-hero">
+          <span className="k8s-badge-advanced mb-3 inline-block">Debugging</span>
+          <h2 className="font-display text-2xl md:text-3xl font-bold">DNS Debugging & Real-World Issues</h2>
+        </motion.div>
 
+        <DNSDebugging />
+
+        {/* --- Quiz --- */}
         <QuizCard
-          title="Services & DNS Quiz"
+          title="Services, DNS & Ingress Quiz"
           questions={[
             {
               question: "What DNS name can a pod use to reach a Service named 'api' in the same namespace?",
@@ -165,6 +164,18 @@ spec:
               options: ["Nothing", "The node IP", "Individual pod IPs", "The cluster gateway"],
               correctIndex: 2,
               explanation: "Headless services return individual pod IPs instead of a single virtual IP, enabling direct pod-to-pod communication."
+            },
+            {
+              question: "Why does 'ndots:5' in /etc/resolv.conf impact DNS performance?",
+              options: ["It limits DNS queries to 5 per second", "It causes search domain expansion — short names generate multiple queries", "It sets the DNS cache to 5 seconds", "It limits to 5 DNS servers"],
+              correctIndex: 1,
+              explanation: "ndots:5 means any name with fewer than 5 dots triggers search domain expansion. A query for 'api.stripe.com' (2 dots) generates 4 failed cluster lookups before the real query is sent."
+            },
+            {
+              question: "How does CoreDNS know about Services in the cluster?",
+              options: ["It reads etcd directly", "It queries the API server on every DNS request", "It uses informers to watch the API server and cache data in memory", "It polls the API server every 30 seconds"],
+              correctIndex: 2,
+              explanation: "CoreDNS uses the kubernetes plugin with Kubernetes informers — it does a LIST on startup and then WATCHes for changes, keeping an in-memory cache that's updated in near-real-time."
             },
           ]}
         />
